@@ -13,7 +13,7 @@ class BesMetrics
   end
 
   def collect
-    @repo.reset
+    #@repo.reset
     revisions = @repo.all_revisions_oldest_first
     summaries = revisions.map {|rev| RevisionSummary.new(rev, @repo, @glob) }
     summaries = record_complexity_deltas(summaries)

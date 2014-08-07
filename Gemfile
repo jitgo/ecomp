@@ -6,3 +6,4 @@ gem 'sinatra'
 gem 'haml'
 
 gem 'ruby_parser'
+gem 'pry'
