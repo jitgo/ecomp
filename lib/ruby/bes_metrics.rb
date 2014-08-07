@@ -20,7 +20,7 @@ class BesMetrics
     @report.update('current_files', CurrentHotspotsReport.new(@repo, @glob))
     @report.update('commits', ComplexityTrendReport.new(summaries))
     @report.update('recent_commits_by_author', DeveloperBehaviourReport.new(summaries))
-    @repo.reset
+    #@repo.reset
   end
 
   private
