@@ -1,5 +1,9 @@
 class LocalGitRepo
 
+  def initialize(excludes)
+    @excludes = excludes
+  end
+
   def reset
     git_command('checkout master')
   end
@@ -51,7 +55,13 @@ class LocalGitRepo
   end
 
   def all_files_matching(files_glob)
-    Dir[files_glob].select {|p| p =~ /\.java$|\.rb$|\.js$|\.m$/}.map {|path| FileRevision.new(path, self) }
+    Dir[files_glob].select {|p| p =~ /\.java$|\.rb$|\.js$|\.m$/}.reject { |v| excluded? v}.map {|path| FileRevision.new(path, self) }
   end
 
+  def excluded?(path)
+    @excludes.each do |pattern|
+      return true if path =~ Regexp.new(pattern)
+    end
+    false
+  end
 end

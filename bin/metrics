@@ -12,14 +12,15 @@ require_relative '../lib/ruby/bes_metrics'
 
 require 'optparse'
 
-options = {}
+options = { :exclude => Array.new }
 OptionParser.new do |opts|
   opts.banner = "Usage: #{File.basename($0)} output_folder files_glob [-n max_revisions]"
 
   opts.on('-n', '--maxrevisions REVISIONS', 'Max revisions') { |v| options[:max_revisions] = v.to_i }
+  opts.on('-e', '--exclude PATTERN', 'Exclude file path or pattern') { |v| options[:exclude] << v }
 end.parse!
 
-
+puts ARGV.inspect
 if ARGV.length != 2
   $stderr.puts "Usage: #{File.basename($0)} output_folder files_glob [-n max_revisions]"
   exit 1
@@ -29,7 +30,7 @@ if options[:max_revisions].nil? or options[:max_revisions] < 1
   options[:max_revisions] = 9999
 end
 
-repo = LocalGitRepo.new
+repo = LocalGitRepo.new(options[:exclude])
 reports_folder = ReportFolder.new(ARGV[0])
 metrics_dao = MetricsDAO.new(ARGV[0])
 bes = BesMetrics.new(repo, reports_folder, metrics_dao, options[:max_revisions], ARGV[1])
