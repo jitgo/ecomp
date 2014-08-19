@@ -36,6 +36,7 @@ function draw_recent_commits_chart(div, data) {
                 day: '%b %e',
                 week: '%b %e'
             },
+            min: minDate
         },
         yAxis: { title: { text: 'Change in total project complexity' } },
         tooltip: {
@@ -167,13 +168,11 @@ function draw_churn_vs_complexity_chart(div, data, max) {
         subtitle: { text: null },
         yAxis: {
             title: { text: 'Complexity' },
-            min: 0,
-            max: max
+            min: 0
         },
         xAxis: {
             title: { text: 'Number of times changed' },
-            min: 0,
-            max: max
+            min: 0
         },
         plotOptions: {
             scatter: {
@@ -229,10 +228,10 @@ function draw_complexity_trend_chart(div, data) {
                 day: '%b %e',
                 week: '%b %e'
             },
+            min: minDate
         },
         yAxis: {
-            title: { text: 'Mean complexity per source file' },
-            min: 0
+            title: { text: 'Mean complexity per source file' }
         },
         series: [{
             data: data,
@@ -272,3 +271,7 @@ window.onhashchange = function(hashChangeEvent) {
 setInterval(function() {
     drawCharts();
 }, 120000);
+
+var dateRange = new Date();
+dateRange.setDate(dateRange.getDate() - 30);
+minDate = Date.UTC(dateRange.getUTCFullYear(), dateRange.getUTCMonth(), dateRange.getUTCDate())
