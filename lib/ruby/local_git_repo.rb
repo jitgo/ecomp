@@ -1,3 +1,5 @@
+require_relative 'file_batch'
+
 class LocalGitRepo
 
   def initialize(excludes)
@@ -55,7 +57,8 @@ class LocalGitRepo
   end
 
   def all_files_matching(files_glob)
-    Dir[files_glob].select {|p| p =~ /\.java$|\.rb$|\.js$|\.m$/}.reject { |v| excluded? v}.map {|path| FileRevision.new(path, self) }
+    files = Dir[files_glob].select {|p| p =~ /\.java$|\.rb$|\.js$|\.m$/}.reject { |v| excluded? v}
+    FileBatch.new(files, self)
   end
 
   def excluded?(path)
