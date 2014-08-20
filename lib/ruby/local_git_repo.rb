@@ -25,12 +25,12 @@ class LocalGitRepo
   end
 
   def all_revisions_oldest_first
-    raw_log = git_command('log --pretty="%h/%aN/%ci/%s" --shortstat')
+    raw_log = git_command('log --pretty="%h!~!%aN!~!%ci!~!%s" --shortstat')
     lines = raw_log.split("\n")
     result = []
     (0..(lines.length-1)).each do |i|
       if lines[i].empty?
-        fields = lines[i-1].split('/')
+        fields = lines[i-1].split("!~!")
         count = lines[i+1].to_i
         result << {
           ref: fields[0],
