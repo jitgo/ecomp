@@ -58,6 +58,41 @@ Once the complexity calculation is complete, the JSON files will then be made av
 
 NOTE: The process is time consuming and involves going through all the previous commits to calculate a play-by-play dataset of complexity changes to each of the source files.
 
+Web Site Options
+================
+
+To select your project either do
+
+```
+#project-name
+```
+
+And the defaults of 30 day range will apply
+
+Or you can specify the following options but you must use project=project-name
+Starting with a hash and then joined using ampersands
+
+To select your project
+```
+project=project-name
+```
+
+To select number of days back, this will override historical
+```
+days=integer-value
+```
+
+To select all history
+```
+historical
+```
+
+e.g. project with name project-name and range of 20 days
+
+```
+my.ip.addess:9292/#project=project-name&days=20
+```
+
 TODO
 ====
 Documenting how to render the datasets so that the data may be visualised. 
