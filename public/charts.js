@@ -21,7 +21,7 @@ function recent_commits_plot(target, data) {
 };
 
 function draw_recent_commits_chart(div, data) {
-    $(div).highcharts({
+    var chartDetails = {
         credits: { enabled: false },
         chart: {
             type: 'bubble',
@@ -35,8 +35,7 @@ function draw_recent_commits_chart(div, data) {
                 hour: '%b %e %H:%M',
                 day: '%b %e',
                 week: '%b %e'
-            },
-            min: minDate
+            }
         },
         yAxis: { title: { text: 'Change in total project complexity' } },
         tooltip: {
@@ -48,7 +47,12 @@ function draw_recent_commits_chart(div, data) {
             }
         },
         series: data
-    });
+    }
+
+    if(historical === false)
+        chartDetails.xAxis['min'] = minDate
+
+    $(div).highcharts(chartDetails);
 };
 
 function hsvToRgb(h, s, v) {
@@ -213,7 +217,7 @@ function ctrend_plot(target, data) {
 };
 
 function draw_complexity_trend_chart(div, data) {
-    $(div).highcharts({
+    var chartDetails = {
         credits: { enabled: false },
         chart: {
             type: 'spline',
@@ -227,8 +231,7 @@ function draw_complexity_trend_chart(div, data) {
                 hour: '%b %e %H:%M',
                 day: '%b %e',
                 week: '%b %e'
-            },
-            min: minDate
+            }
         },
         yAxis: {
             title: { text: 'Mean complexity per source file' }
@@ -237,26 +240,51 @@ function draw_complexity_trend_chart(div, data) {
             data: data,
             name: 'Mean complexity'
         }]
-    });
+    }
+
+    if(historical === false)
+        chartDetails.xAxis['min'] = minDate
+
+    $(div).highcharts(chartDetails);
 };
 
 function draw_chart(filename, target_div, charting_function) {
-  $.getJSON("/data/"+projectFromDocumentLocation()+"/" + filename + ".json", function(data) {
-    charting_function(target_div, data);
-  });
+    if(options.hasOwnProperty('project'))
+        $.getJSON("/data/" + options.project + "/" + filename + ".json", function(data) {
+            charting_function(target_div, data);
+        });
+    else {
+        var project = location.hash.split('#')[1]
+        $.getJSON("/data/" + project + "/" + filename + ".json", function(data) {
+            charting_function(target_div, data);
+        });
+    }
 };
 
-function projectFromDocumentLocation()
-{
-    var project = document.location.hash.substring(1);
-    if(project.length == 0)
-    {
-        alert("Append a # to the end of the URL followed by a project name (e.g. #iplayer). This will make the chart data load from the data/iplayer/ directory");
+function getOptions() {
+    var hash = location.hash
+    values = hash.split('#')[1]
+    ampers = values.split('&')
+    options = {}
+    for(var a in ampers) {
+        var amp = ampers[a].split('=')
+        options[amp[0]] = amp[1]
     }
-    return project;
+    return options;
 }
 
+var options = {}
+var days = 30
+historical = false
 function drawCharts() {
+    options = getOptions();
+    if(options.hasOwnProperty('days')) {
+        dateRange = new Date()
+        dateRange.setDate(dateRange.getDate() - options.days)
+        minDate = Date.UTC(dateRange.getUTCFullYear(), dateRange.getUTCMonth(), dateRange.getUTCDate())
+    } else if(options.hasOwnProperty('historical'))
+        historical = true
+
     draw_chart('recent_commits_by_author', '#recent_commits', recent_commits_plot);
     draw_chart('current_files', '#churn_vs_complexity', churn_vs_complexity_plot);
     draw_chart('commits', '#complexity_trend', ctrend_plot);
@@ -272,6 +300,7 @@ setInterval(function() {
     drawCharts();
 }, 120000);
 
-var dateRange = new Date();
-dateRange.setDate(dateRange.getDate() - 30);
-minDate = Date.UTC(dateRange.getUTCFullYear(), dateRange.getUTCMonth(), dateRange.getUTCDate())
+//default to 30 days
+var dateRange = new Date()
+dateRange.setDate(dateRange.getDate() - days)
+var minDate = Date.UTC(dateRange.getUTCFullYear(), dateRange.getUTCMonth(), dateRange.getUTCDate())
