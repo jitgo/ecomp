@@ -17,13 +17,11 @@ class BesMetrics
   end
 
   def collect
-    puts 'Gathering metrics...'
     find_and_analyse_new_revisions
-    puts 'Creating reports...'
     @report.update('recent_commits_by_author', DeveloperBehaviourReport.new(get_all_summaries_from_metrics))
     @report.update('current_files', CurrentHotspotsReport.new(@repo, @glob))
     @repo.reset
-    puts "...completed"
+    puts "Complete"
   end
 
   private
@@ -47,10 +45,9 @@ class BesMetrics
       count += 1
       timeTaken = Time.now - startTime
       eta = (revisions_to_analyse - count) * timeTaken
-      puts "ETA: " + EtaFormatter.formatFromSeconds(eta)
+      puts "Revision Process Time: " + ("%.2fs" % timeTaken) + " Time Remaining: " + EtaFormatter.formatFromSeconds(eta)
     end
 
-    puts "...completed"
   end
 
   def get_number_of_revisions_to_analyse(latest_revision_metrics)
