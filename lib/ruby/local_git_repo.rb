@@ -11,7 +11,7 @@ class LocalGitRepo
   end
 
   def num_commits_involving(path)
-    git_command("log --pretty=%h #{path}").split("\n").length
+    git_command("log --pretty=%h '#{path}'").split("\n").length
   end
 
   def current_files(files_glob)

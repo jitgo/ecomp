@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Script to run ObjC Parser
+#
+
+JAVA=$JAVA_HOME/bin/java
+if [ ! -e "which $JAVA" ]; then
+   if [ -z "which java" ]; then
+	echo NO USABLE JAVA AVAILABLE
+	exit -1
+   else
+	JAVA=`which java`
+   fi
+fi	
+
+OBJCPARSER_HOME=`dirname "$0"`/..
+lib="${OBJCPARSER_HOME}/lib/objc"
+
+$JAVA -jar $lib/objcparser.jar "$@" 2> /dev/null

@@ -1,5 +1,6 @@
 require_relative 'javascript_source_batch'
 require_relative 'java_source_batch'
+require_relative 'objc_source_batch'
 
 class FileBatch
   def initialize(files, repo)
@@ -25,6 +26,12 @@ class FileBatch
       javaresult = process_java(javafilenames)
       @batchresults.merge!(javaresult)
     end
+
+    objcfilenames = @files.select { |file| file.path =~ /.m$/ }.map { |file| file.path }
+    if not objcfilenames.empty?
+      objcresult = process_objc(objcfilenames)
+      @batchresults.merge!(objcresult)
+    end
     # rubyresult = ...
     # objcresult = ...
     
@@ -39,6 +46,11 @@ class FileBatch
   
   def process_java(files)
     batch = JavaSourceBatch.new(files)
+    batch.process
+  end
+  
+  def process_objc(files)
+    batch = ObjCSourceBatch.new(files)
     batch.process
   end
 end

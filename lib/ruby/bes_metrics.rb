@@ -4,6 +4,7 @@ require_relative 'revision_summary_from_metrics'
 require_relative 'complexity_trend_report'
 require_relative 'developer_behaviour_report'
 require_relative 'current_hotspots_report'
+require_relative 'eta_formatter'
 
 class BesMetrics
 
@@ -46,7 +47,7 @@ class BesMetrics
       count += 1
       timeTaken = Time.now - startTime
       eta = (revisions_to_analyse - count) * timeTaken
-      puts "ETA: " + ("%.2f" % eta).to_s + "s"
+      puts "ETA: " + EtaFormatter.formatFromSeconds(eta)
     end
 
     puts "...completed"

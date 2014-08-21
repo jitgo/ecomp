@@ -669,7 +669,7 @@ IntegerTypeSuffix
 	;
 // Not sure how we can get around .9f style floating point numbers, antlr warns empty strings could be matched <: (
 FLOATING_POINT_LITERAL
-    :   ('0'..'9'|'') ('.' ('0'..'9')*)? Exponent? FloatTypeSuffix?
+    :   ('0'..'9')+ ('.' ('0'..'9')*)? Exponent? FloatTypeSuffix?
 	;
 
 fragment
