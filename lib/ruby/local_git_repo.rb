@@ -57,14 +57,15 @@ class LocalGitRepo
   end
 
   def all_files_matching(files_glob)
-    files = Dir[files_glob].select {|p| p =~ /\.java$|\.rb$|\.js$|\.m$/}.reject { |v| excluded? v}
+    excluded_files = []
+    @excludes.each {|path| excluded_files.concat(filesForGlob(path)) }
+    
+    files = filesForGlob(files_glob).reject { |v| excluded_files.index(v) != nil }
     FileBatch.new(files, self)
   end
 
-  def excluded?(path)
-    @excludes.each do |pattern|
-      return true if path =~ Regexp.new(pattern)
-    end
-    false
+  def filesForGlob(glob)
+    Dir[glob].select { |p| p =~ /\.java$|\.rb$|\.js$|\.m$/ } 
   end
+
 end
