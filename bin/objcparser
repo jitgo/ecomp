@@ -16,4 +16,8 @@ fi
 OBJCPARSER_HOME=`dirname "$0"`/..
 lib="${OBJCPARSER_HOME}/lib/objc"
 
-$JAVA -jar $lib/objcparser.jar "$@" 2> /dev/null
+if [ -z "$NUM_THREADS" ]; then
+	NUM_THREADS=1
+fi
+
+$JAVA -jar -DnumThreads=$NUM_THREADS $lib/objcparser.jar "$@" 2> /dev/null
