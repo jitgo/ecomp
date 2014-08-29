@@ -157,7 +157,8 @@ function churn_vs_complexity_plot(target, data) {
             x: ch,
             y: w,
             color: colour_for(w, ch, max_complexity, max_churn),
-            name: item.filename
+            name: item.filename.substring(item.filename.lastIndexOf("/")+1, item.filename.length),
+            fullName: item.filename
         });
     });
     draw_churn_vs_complexity_chart(target, points, Math.max(max_complexity, max_churn));
@@ -192,7 +193,7 @@ function draw_churn_vs_complexity_chart(div, data, max) {
                 states: { hover: { marker: { enabled: false } } },
                 tooltip: {
                     headerFormat: '<b>{point.key}</b><br>',
-                    pointFormat: 'Complexity: {point.y}<br>Number of commits: {point.x}'
+                    pointFormat: '{point.fullName}<br/>Complexity: {point.y}<br>Number of commits: {point.x}'
                 }
             }
         },
