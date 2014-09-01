@@ -14,7 +14,8 @@ function recent_commits_plot(target, data) {
         });
         series.push({
             data: pts,
-            name: item.author
+            name: item.author,
+            turboThreshold: 0
         });
     });
     draw_recent_commits_chart(target, series);
@@ -157,7 +158,8 @@ function churn_vs_complexity_plot(target, data) {
             x: ch,
             y: w,
             color: colour_for(w, ch, max_complexity, max_churn),
-            name: item.filename
+            name: item.filename.substring(item.filename.lastIndexOf("/")+1, item.filename.length),
+            fullName: item.filename
         });
     });
     draw_churn_vs_complexity_chart(target, points, Math.max(max_complexity, max_churn));
@@ -192,14 +194,15 @@ function draw_churn_vs_complexity_chart(div, data, max) {
                 states: { hover: { marker: { enabled: false } } },
                 tooltip: {
                     headerFormat: '<b>{point.key}</b><br>',
-                    pointFormat: 'Complexity: {point.y}<br>Number of commits: {point.x}'
+                    pointFormat: '{point.fullName}<br/>Complexity: {point.y}<br>Number of commits: {point.x}'
                 }
             }
         },
         series: [{
             type: 'scatter',
             name: 'Source files',
-            data: data
+            data: data,
+            turboThreshold: 0
         }]
     });
 };
@@ -238,7 +241,8 @@ function draw_complexity_trend_chart(div, data) {
         },
         series: [{
             data: data,
-            name: 'Mean complexity'
+            name: 'Mean complexity',
+            turboThreshold: 0
         }]
     }
 
