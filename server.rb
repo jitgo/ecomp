@@ -4,7 +4,7 @@ require 'json'
 
 get '/list' do
 	output = ""
-	for x in Dir.entries("public/data").reject { |path| path.start_with?(".") }
+	for x in Dir.entries("public/data").reject { |path| path.start_with?(".") }.sort
 		output += "<li><a href=\"/#"+x+"\">"+x+"</a></li>"
 	end
 
@@ -12,12 +12,7 @@ get '/list' do
 end
 
 get '/list.json' do
-	output = []
-	for x in Dir.entries("public/data").reject { |path| path.start_with?(".") }
-		output.push(x)
-	end
-
-	JSON.generate(output)
+	JSON.generate(Dir.entries("public/data").reject { |path| path.start_with?(".") }.sort)
 end
 
 get '/' do
