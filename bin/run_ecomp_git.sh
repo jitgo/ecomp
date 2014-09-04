@@ -25,7 +25,7 @@ echo
 
 ECOMP_DIR=`dirname $0`/../
 
-REPORT_DIRECTORY=`pwd`/$PROJECT_DIR/reports
+REPORT_DIRECTORY=~/mnt/ecompjson/$PROJECT_DIR
 
 if [ ! -d "$PROJECT_DIR" ]; then
 	echo Performing initial git clone for revision range $SVN_REVISION - $END_SVN_REVISION
