@@ -213,11 +213,24 @@ function ctrend_plot(target, data) {
         points.push({
             x: Date.parse(item.date),
             y: item.complexity.mean_of_file_weights,
-            name: item.ref + " by " + item.author
+            name: item.ref + " by " + item.author + " " + item.comment
         });
     });
     draw_complexity_trend_chart(target, points);
 };
+
+function total_ctrend_plot(target, data) {
+    var points = [];
+    $.each(data, function(i, item) {
+        points.push({
+            x: Date.parse(item.date),
+            y: item.complexity.sum_of_file_weights,
+            name: item.ref + " by " + item.author + " " + item.comment
+        });
+    });
+    draw_total_complexity_trend_chart(target, points);
+};
+
 
 function draw_complexity_trend_chart(div, data) {
     var chartDetails = {
@@ -242,6 +255,39 @@ function draw_complexity_trend_chart(div, data) {
         series: [{
             data: data,
             name: 'Mean complexity',
+            turboThreshold: 0
+        }]
+    }
+
+    if(historical === false)
+        chartDetails.xAxis['min'] = minDate
+
+    $(div).highcharts(chartDetails);
+};
+
+function draw_total_complexity_trend_chart(div, data) {
+    var chartDetails = {
+        credits: { enabled: false },
+        chart: {
+            type: 'spline',
+            zoomType: 'xy'
+        },
+        title: { text: null },
+        subtitle: { text: null },
+        xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: {
+                hour: '%b %e %H:%M',
+                day: '%b %e',
+                week: '%b %e'
+            }
+        },
+        yAxis: {
+            title: { text: 'Total Complexity' }
+        },
+        series: [{
+            data: data,
+            name: 'Total Complexity',
             turboThreshold: 0
         }]
     }
@@ -292,6 +338,7 @@ function drawCharts() {
     draw_chart('recent_commits_by_author', '#recent_commits', recent_commits_plot);
     draw_chart('current_files', '#churn_vs_complexity', churn_vs_complexity_plot);
     draw_chart('commits', '#complexity_trend', ctrend_plot);
+    draw_chart('commits', '#total_complexity_trend', total_ctrend_plot);
 }
 
 $(document).ready(drawCharts);
