@@ -57,7 +57,7 @@ else
 	echo
 fi
 
-../metrics $REPORT_DIRECTORY "$FILE_GLOB" $FORMATTED_EXCLUSIONS
+metrics $REPORT_DIRECTORY "$FILE_GLOB" $FORMATTED_EXCLUSIONS
 if [ ! -e "$ECOMP_DIR/public/data/$PROJECT_DIR" ]; then
 	echo Creating project report data symlink from $REPORT_DIRECTORY to $ECOMP_DIR/public/data/$PROJECT_DIR
 	ln -sf $REPORT_DIRECTORY $ECOMP_DIR/public/data/$PROJECT_DIR
