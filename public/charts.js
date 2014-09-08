@@ -208,31 +208,26 @@ function draw_churn_vs_complexity_chart(div, data, max) {
 };
 
 function ctrend_plot(target, data) {
-    var points = [];
+    var meanPoints = [];
+    var totalPoints = [];
     $.each(data, function(i, item) {
-        points.push({
-            x: Date.parse(item.date),
+        var px = Date.parse(item.date);
+        var pname = item.ref + " by " + item.author + " " + item.comment;
+        meanPoints.push({
+            x: px,
             y: item.complexity.mean_of_file_weights,
-            name: item.ref + " by " + item.author + " " + item.comment
+            name: pname
         });
-    });
-    draw_complexity_trend_chart(target, points);
-};
-
-function total_ctrend_plot(target, data) {
-    var points = [];
-    $.each(data, function(i, item) {
-        points.push({
-            x: Date.parse(item.date),
+        totalPoints.push({
+            x: px,
             y: item.complexity.sum_of_file_weights,
-            name: item.ref + " by " + item.author + " " + item.comment
+            name: pname
         });
     });
-    draw_total_complexity_trend_chart(target, points);
+    draw_complexity_trend_chart(target, meanPoints, totalPoints);
 };
 
-
-function draw_complexity_trend_chart(div, data) {
+function draw_complexity_trend_chart(div, meanTrendData, totalTrendData) {
     var chartDetails = {
         credits: { enabled: false },
         chart: {
@@ -249,47 +244,29 @@ function draw_complexity_trend_chart(div, data) {
                 week: '%b %e'
             }
         },
-        yAxis: {
-            title: { text: 'Mean complexity per source file' }
-        },
-        series: [{
-            data: data,
-            name: 'Mean complexity',
-            turboThreshold: 0
-        }]
-    }
-
-    if(historical === false)
-        chartDetails.xAxis['min'] = minDate
-
-    $(div).highcharts(chartDetails);
-};
-
-function draw_total_complexity_trend_chart(div, data) {
-    var chartDetails = {
-        credits: { enabled: false },
-        chart: {
-            type: 'spline',
-            zoomType: 'xy'
-        },
-        title: { text: null },
-        subtitle: { text: null },
-        xAxis: {
-            type: 'datetime',
-            dateTimeLabelFormats: {
-                hour: '%b %e %H:%M',
-                day: '%b %e',
-                week: '%b %e'
+        yAxis: [
+            {
+                title: { text: 'Total Complexity' }
+            },
+            {
+                title: { text: 'Mean File Complexity' },
+                opposite: true
             }
-        },
-        yAxis: {
-            title: { text: 'Total Complexity' }
-        },
-        series: [{
-            data: data,
-            name: 'Total Complexity',
-            turboThreshold: 0
-        }]
+        ],
+        series: [
+            {
+                yAxis: 0,
+                data: totalTrendData,
+                name: 'Total Complexity',
+                turboThreshold: 0
+            },
+            {
+                yAxis: 1,
+                data: meanTrendData,
+                name: 'Mean complexity',
+                turboThreshold: 0
+            }
+        ]
     }
 
     if(historical === false)
@@ -338,7 +315,6 @@ function drawCharts() {
     draw_chart('recent_commits_by_author', '#recent_commits', recent_commits_plot);
     draw_chart('current_files', '#churn_vs_complexity', churn_vs_complexity_plot);
     draw_chart('commits', '#complexity_trend', ctrend_plot);
-    draw_chart('commits', '#total_complexity_trend', total_ctrend_plot);
 }
 
 $(document).ready(drawCharts);
