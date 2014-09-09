@@ -210,6 +210,7 @@ function draw_churn_vs_complexity_chart(div, data, max) {
 function ctrend_plot(target, data) {
     var meanPoints = [];
     var totalPoints = [];
+    
     $.each(data, function(i, item) {
         var px = Date.parse(item.date);
         var pname = item.ref + " by " + item.author + " " + item.comment;
@@ -276,16 +277,16 @@ function draw_complexity_trend_chart(div, meanTrendData, totalTrendData) {
 };
 
 function draw_chart(filename, target_div, charting_function) {
-    if(options.hasOwnProperty('project'))
-        $.getJSON("/data/" + options.project + "/" + filename + ".json", function(data) {
-            charting_function(target_div, data);
-        });
-    else {
+    var dataFile = "";
+    if(options.hasOwnProperty('project')) {
+        dataFile = "/data/" + options.project + "/" + filename + ".json";
+    } else {
         var project = location.hash.split('#')[1]
-        $.getJSON("/data/" + project + "/" + filename + ".json", function(data) {
-            charting_function(target_div, data);
-        });
+        dataFile = "/data/" + project + "/" + filename + ".json";
     }
+    $.getJSON(dataFile, function(data) {
+        charting_function(target_div, data);
+    });
 };
 
 function getOptions() {
