@@ -210,6 +210,8 @@ function draw_churn_vs_complexity_chart(div, data, max) {
 function ctrend_plot(target, data) {
     var meanPoints = [];
     var totalPoints = [];
+    var percentile99 = [];
+    var percentile95 = [];
     
     $.each(data, function(i, item) {
         var px = Date.parse(item.date);
@@ -224,11 +226,21 @@ function ctrend_plot(target, data) {
             y: item.complexity.sum_of_file_weights,
             name: pname
         });
+        percentile99.push({
+            x: px,
+            y: item.complexity.percentile_99,
+            name: pname
+        });
+		percentile95.push({
+            x: px,
+            y: item.complexity.percentile_95,
+            name: pname
+        });
     });
-    draw_complexity_trend_chart(target, meanPoints, totalPoints);
+    draw_complexity_trend_chart(target, meanPoints, totalPoints, percentile99, percentile95);
 };
 
-function draw_complexity_trend_chart(div, meanTrendData, totalTrendData) {
+function draw_complexity_trend_chart(div, meanTrendData, totalTrendData, percentile99Data, percentile95Data) {
     var chartDetails = {
         credits: { enabled: false },
         chart: {
@@ -265,6 +277,18 @@ function draw_complexity_trend_chart(div, meanTrendData, totalTrendData) {
                 yAxis: 1,
                 data: meanTrendData,
                 name: 'Mean complexity',
+                turboThreshold: 0
+            },
+            {
+                yAxis: 1,
+                data: percentile99Data,
+                name: '99th percentile',
+                turboThreshold: 0
+            },
+            {
+                yAxis: 1,
+                data: percentile95Data,
+                name: '95th percentile',
                 turboThreshold: 0
             }
         ]
