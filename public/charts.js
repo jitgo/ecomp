@@ -262,7 +262,7 @@ function draw_complexity_trend_chart(div, meanTrendData, totalTrendData, percent
                 title: { text: 'Total Complexity' }
             },
             {
-                title: { text: 'File Complexity' },
+                title: { text: 'Mean File Complexity' },
                 opposite: true
             }
         ],
@@ -270,13 +270,13 @@ function draw_complexity_trend_chart(div, meanTrendData, totalTrendData, percent
             {
                 yAxis: 0,
                 data: totalTrendData,
-                name: 'Total',
+                name: 'Total Complexity',
                 turboThreshold: 0
             },
             {
                 yAxis: 1,
                 data: meanTrendData,
-                name: 'Mean',
+                name: 'Mean complexity',
                 turboThreshold: 0
             },
             {
