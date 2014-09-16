@@ -1,3 +1,5 @@
+require 'descriptive_statistics'
+
 class RevisionSummary
 
   def initialize(rev, repo, glob)
@@ -58,7 +60,9 @@ class RevisionSummary
     {
       sum_of_file_weights: weight_sum,
       max_of_file_weights: weights.max,
-      mean_of_file_weights: (weight_sum.to_f / weights.length).round(2)
+      mean_of_file_weights: (weight_sum.to_f / weights.length).round(2),
+      percentile_99: weights.percentile(99).round(2),
+      percentile_95: weights.percentile(95).round(2),
     }
   end
 end

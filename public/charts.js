@@ -210,6 +210,9 @@ function draw_churn_vs_complexity_chart(div, data, max) {
 function ctrend_plot(target, data) {
     var meanPoints = [];
     var totalPoints = [];
+    var percentile99 = [];
+    var percentile95 = [];
+    
     $.each(data, function(i, item) {
         var px = Date.parse(item.date);
         var pname = item.ref + " by " + item.author + " " + item.comment;
@@ -223,11 +226,21 @@ function ctrend_plot(target, data) {
             y: item.complexity.sum_of_file_weights,
             name: pname
         });
+        percentile99.push({
+            x: px,
+            y: item.complexity.percentile_99,
+            name: pname
+        });
+		percentile95.push({
+            x: px,
+            y: item.complexity.percentile_95,
+            name: pname
+        });
     });
-    draw_complexity_trend_chart(target, meanPoints, totalPoints);
+    draw_complexity_trend_chart(target, meanPoints, totalPoints, percentile99, percentile95);
 };
 
-function draw_complexity_trend_chart(div, meanTrendData, totalTrendData) {
+function draw_complexity_trend_chart(div, meanTrendData, totalTrendData, percentile99Data, percentile95Data) {
     var chartDetails = {
         credits: { enabled: false },
         chart: {
@@ -249,7 +262,7 @@ function draw_complexity_trend_chart(div, meanTrendData, totalTrendData) {
                 title: { text: 'Total Complexity' }
             },
             {
-                title: { text: 'Mean File Complexity' },
+                title: { text: 'File Complexity' },
                 opposite: true
             }
         ],
@@ -257,13 +270,25 @@ function draw_complexity_trend_chart(div, meanTrendData, totalTrendData) {
             {
                 yAxis: 0,
                 data: totalTrendData,
-                name: 'Total Complexity',
+                name: 'Total',
                 turboThreshold: 0
             },
             {
                 yAxis: 1,
                 data: meanTrendData,
-                name: 'Mean complexity',
+                name: 'Mean',
+                turboThreshold: 0
+            },
+            {
+                yAxis: 1,
+                data: percentile99Data,
+                name: '99th percentile',
+                turboThreshold: 0
+            },
+            {
+                yAxis: 1,
+                data: percentile95Data,
+                name: '95th percentile',
                 turboThreshold: 0
             }
         ]
@@ -276,16 +301,16 @@ function draw_complexity_trend_chart(div, meanTrendData, totalTrendData) {
 };
 
 function draw_chart(filename, target_div, charting_function) {
-    if(options.hasOwnProperty('project'))
-        $.getJSON("/data/" + options.project + "/" + filename + ".json", function(data) {
-            charting_function(target_div, data);
-        });
-    else {
+    var dataFile = "";
+    if(options.hasOwnProperty('project')) {
+        dataFile = "/data/" + options.project + "/" + filename + ".json";
+    } else {
         var project = location.hash.split('#')[1]
-        $.getJSON("/data/" + project + "/" + filename + ".json", function(data) {
-            charting_function(target_div, data);
-        });
+        dataFile = "/data/" + project + "/" + filename + ".json";
     }
+    $.getJSON(dataFile, function(data) {
+        charting_function(target_div, data);
+    });
 };
 
 function getOptions() {
