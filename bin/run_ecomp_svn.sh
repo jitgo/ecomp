@@ -1,10 +1,13 @@
 #!/bin/bash
 
 SVN_REPO=$1
-PROJECT_DIR=$2
+PROJECT_NAME=$2
 FILE_GLOB=$3
 EXCLUSION_LIST=$4
 FORMATTED_EXCLUSIONS=""
+
+PROJECT_DIR=/home/jenkins/ecompSvnRepos/$PROJECT_NAME
+REPORT_DIRECTORY=/mnt/ecompjson/$PROJECT_NAME
 
 if [ ! -z "$EXCLUSION_LIST" ]; then
 	IFS=","
@@ -17,7 +20,7 @@ fi
 unset IFS
 
 if [[ -z "$SVN_REPO" || -z "$PROJECT_DIR" || -z "$FILE_GLOB" ]]; then
-  echo Usage: `basename $0` svn_repository_url target_project_dir file_glob [csv_for_excluded_files]
+  echo Usage: `basename $0` svn_repository_url project_name file_glob [csv_for_excluded_files]
   exit -1
 fi
 
@@ -38,7 +41,6 @@ fi
 
 END_SVN_REVISION=$(svn info $SVN_REPO | grep "^Last Changed Rev: " | awk '{ print $4 }')
 TRANSLATE_AUTHOR=`which translate_bbc_username.pl`
-REPORT_DIRECTORY=`pwd`/$PROJECT_DIR/reports
 
 if [ ! -d "$PROJECT_DIR" ]; then
 	echo Performing initial git svn clone for revision range $SVN_REVISION - $END_SVN_REVISION
@@ -70,7 +72,3 @@ else
 fi
 
 metrics $REPORT_DIRECTORY "$FILE_GLOB" $FORMATTED_EXCLUSIONS
-if [ ! -e "$ECOMP_DIR/public/data/$PROJECT_DIR" ]; then
-	echo Creating project report data symlink from $REPORT_DIRECTORY to $ECOMP_DIR/public/data/$PROJECT_DIR
-	ln -sf $REPORT_DIRECTORY $ECOMP_DIR/public/data/$PROJECT_DIR
-fi
