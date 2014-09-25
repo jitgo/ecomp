@@ -6,8 +6,8 @@ EXCLUSION_LIST=$3
 FORMATTED_EXCLUSIONS=""
 
 # Calculate project name from GIT repository URL
-PROJECT_NAME={$GIT_REPO##*/}
-PROJECT_NAME={$PROJECT_NAME%.git*}
+PROJECT_NAME=${GIT_REPO##*/}
+PROJECT_NAME=${PROJECT_NAME%.git*}
 
 PROJECT_DIR=/home/jenkins/ecompGitRepos/$PROJECT_NAME
 REPORT_DIRECTORY=/mnt/ecompjson/$PROJECT_NAME
