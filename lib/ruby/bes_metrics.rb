@@ -34,8 +34,11 @@ class BesMetrics
     revisions_to_analyse = get_number_of_revisions_to_analyse(latest_revision_metrics)
     puts "There are #{revisions_to_analyse} revisions to analyse"
 
+    totalTime = 0
     while (not revision.nil? and (count < @max_revisions)) do
+
       startTime = Time.now
+
       puts "Analysing #{count + 1}/#{revisions_to_analyse}..."
       summary = record_complexity_delta(RevisionSummary.new(revision, @repo, @glob), latest_revision_metrics)
       @metrics_dao.add_revision_summary(summary)
@@ -43,8 +46,12 @@ class BesMetrics
       latest_revision_metrics = @metrics_dao.get_latest_revision_metrics
       revision = find_oldest_unanalysed_revision(latest_revision_metrics)
       count += 1
+
       timeTaken = Time.now - startTime
-      eta = (revisions_to_analyse - count) * timeTaken
+      totalTime += timeTaken
+
+      eta = (revisions_to_analyse - count) * (totalTime / count)
+
       puts "Revision Process Time: " + ("%.2fs" % timeTaken) + " Time Remaining: " + EtaFormatter.formatFromSeconds(eta)
     end
 
