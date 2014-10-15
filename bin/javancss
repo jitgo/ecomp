@@ -21,4 +21,4 @@ lib="${JAVANCSS_HOME}/lib/java"
 
 classpath=${lib}/javancss-1.1.jar:${lib}/ccl.jar:${CLASSPATH}
 
-$JAVA -classpath $classpath javancss.Main $@
+$JAVA -classpath $classpath javancss.Main "$@"
