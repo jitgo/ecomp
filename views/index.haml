@@ -15,9 +15,10 @@
   %body
     .container-fluid
       .row
+        %h1 Project: <span id="project_name">...</span>
+      .row
         .col-md-8
-          %h2
-            Recent commits <small>Contribution to total complexity</small>
+          %h2 Recent commits <small>Contribution to total complexity</small>
           .chart-area#recent_commits
             %img#loading-image(src='/images/ajax-loader.gif')
         .col-md-4

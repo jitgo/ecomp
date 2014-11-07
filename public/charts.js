@@ -3,14 +3,19 @@ function recent_commits_plot(target, data) {
     var series = [];
     $.each(data, function(i, item) {
         var pts = [];
+	var monthAgo = new Date();
+	monthAgo.setMonth(monthAgo.getMonth()-1);
         $.each(item.commits, function(i, c) {
-            pts.push({
-                name: c.ref,
-                message: c.comment,
-                x: Date.parse(c.date),
-                y: c.complexity.delta_sum_of_file_weights,
-                z: c.num_files_touched
-            });
+	    if(Date.parse(c.date) > monthAgo.getTime())
+	    {
+            	pts.push({
+                	name: c.ref,
+           	     	message: c.comment,
+               		x: Date.parse(c.date),
+                	y: c.complexity.delta_sum_of_file_weights,
+                	z: c.num_files_touched
+            	});
+	    }
         });
         series.push({
             data: pts,
@@ -306,6 +311,7 @@ function draw_chart(filename, target_div, charting_function) {
         dataFile = "/data/" + options.project + "/" + filename + ".json";
     } else {
         var project = location.hash.split('#')[1]
+	document.getElementById("project_name").innerHTML = project;
         dataFile = "/data/" + project + "/" + filename + ".json";
     }
     $.getJSON(dataFile, function(data) {
