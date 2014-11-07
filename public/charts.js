@@ -259,6 +259,7 @@ function draw_chart(filename, target_div, charting_function) {
         });
     else {
         var project = location.hash.split('#')[1]
+	document.getElementById("project_name").innerHTML = project;
         $.getJSON("/data/" + project + "/" + filename + ".json", function(data) {
             charting_function(target_div, data);
         });
