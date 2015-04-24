@@ -6,6 +6,46 @@ import subprocess
 def printUsage():
 	print "Usage: "+os.path.basename(sys.argv[0])+" git_repository_url"
 
+def svnEarliestRevision(repo):
+	proc = subprocess.Popen(["svn", "log", "-r1:HEAD", "-l", "1", repo], stdout=subprocess.PIPE)
+	proc.wait()
+	if proc.returncode != 0:
+		print "Failed to get starting revision for SVN repository"
+		sys.exit(-1)
+
+	proc.stdout.readline()
+	revision = proc.stdout.readline().split(' ')[0].strip('r')
+	return revision
+
+def svnLatestRevision(repo):
+	proc = subprocess.Popen(["svn", "log", "-l", "1", repo], stdout=subprocess.PIPE)
+	proc.wait()
+	if proc.returncode != 0:
+		print "Failed to get ending revision for SVN repository"
+		sys.exit(-1)
+
+	proc.stdout.readline()
+	revision = proc.stdout.readline().split(' ')[0].strip('r')
+	return revision
+
+def gitSvnCheckout(repo, outputDirectory):
+	startRevision = svnEarliestRevision(repo)
+	endRevision = svnLatestRevision(repo)
+	if subprocess.call(["git", "svn", "clone", "-r"+startRevision+":"+endRevision, repo, outputDirectory]):
+		print "Could not git svn clone the project"
+		sys.exit(-1)
+
+def gitSvnRebase(projectDir):
+	if subprocess.call(["git", "checkout", "-f", "master"]) != 0:
+		print "There were errors checking out master"
+		sys.exit(-1)
+	if subprocess.call(["git", "clean", "-x", "-f", "-d"]) != 0:
+		print "There were errors cleaning the project working directory"
+		sys.exit(-1)
+	if subprocess.call(["git", "svn", "rebase"]):
+		print "There were errors git svn rebasing the project"
+		sys.exit(-1)
+
 def gitCheckout(repo, outputDirectory):
 	if subprocess.call(["git", "clone", repo, outputDirectory]) != 0:
 		print "There were errors cloning the project, please fix this before continuing"
@@ -32,7 +72,10 @@ def readFileContentsToList(fileName):
 	return returnList
 
 def projectNameFromRepositoryUrl(repo):
-	return os.path.basename(repo)[:-4]
+	if (repo.endswith(".git")):
+		return os.path.basename(repo)[:-4]
+	else:
+		return os.path.basename(repo)
 
 def constructMetricsCommand(reportDirectory, inclusionList, exclusionList):
 	return ["metrics", reportDirectory] + inclusionList + exclusionList
@@ -41,24 +84,39 @@ if len(sys.argv) != 2:
 	printUsage()
 	sys.exit(-1)
 
-gitRepoUrl=sys.argv[1]
-projectName=projectNameFromRepositoryUrl(gitRepoUrl)
-projectDirectory=projectName+".ecomp"
-reportDirectory="../"+projectName+".ecompreport"
 
-print "Using git repository '"+gitRepoUrl+"'"
-print "Project name: "+ projectName
-print "Project checkout directory: "+projectDirectory
-print "Report directory: "+reportDirectory
+gitRepoUrl = sys.argv[1]
+projectName = projectNameFromRepositoryUrl(gitRepoUrl)
+projectDirectory = projectName + ".ecomp"
+reportDirectory = "../" + projectName + ".ecompreport"
 
-if not os.path.exists(projectDirectory):
-	print "Attempting to clone "+gitRepoUrl
-	gitCheckout(gitRepoUrl, projectDirectory)
-	os.chdir(projectDirectory)
+print "Project name: " + projectName
+print "Project checkout directory: " + projectDirectory
+print "Report directory: " + reportDirectory
+
+if not gitRepoUrl.startswith("https://repo.dev.bbc.co.uk"):
+	print "Using git repository '" + gitRepoUrl + "'"
+	if not os.path.exists(projectDirectory):
+		print "Attempting to clone " + gitRepoUrl
+		gitCheckout(gitRepoUrl, projectDirectory)
+		os.chdir(projectDirectory)
+	else:
+		os.chdir(projectDirectory)
+		print "Pulling latest changes from " + gitRepoUrl
+		gitUpdate(projectDirectory)
 else:
-	os.chdir(projectDirectory)
-	print "Pulling latest changes from "+gitRepoUrl
-	gitUpdate(projectDirectory)
+	print "Using SVN repository '" + gitRepoUrl + "'"
+	if not os.path.exists(projectDirectory):
+		print "Attempting to svn-git clone " + gitRepoUrl
+		gitSvnCheckout(gitRepoUrl, projectDirectory)
+		os.chdir(projectDirectory)
+	else:
+		os.chdir(projectDirectory)
+		print "SVN rebasing latest changes from " + gitRepoUrl
+		gitSvnRebase(projectDirectory)
+
+
+
 
 print "Parsing .ecompconfig"
 if not os.path.exists(".ecompconfig"):
